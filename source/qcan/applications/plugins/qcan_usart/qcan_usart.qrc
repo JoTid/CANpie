@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/usart.png</file>
+        <file>images/usart_if.png</file>
+    </qresource>
+</RCC>

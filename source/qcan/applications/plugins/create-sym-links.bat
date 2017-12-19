@@ -18,5 +18,6 @@ set MCL_PATH="O:\MicroControl\Libraries\CANpie"
 :
 if not exist .\qcan_ixxat\include mklink /d .\qcan_ixxat\include %MCL_PATH%\ixxat_VCI_3_5_4_4533\sdk\Microsoft_VisualC\inc
 if not exist .\qcan_peak\include mklink /d .\qcan_peak\include %MCL_PATH%\PCAN_Basic_Windows_4.0.3.75\Include
+if not exist .\qcan_usart\include mklink /d .\qcan_usart\include .\..\..\..\..\..\..\mcl\source
 
 echo.&pause
