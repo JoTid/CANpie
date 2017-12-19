@@ -43,7 +43,7 @@ OBJECTS_DIR = ../../../../objs
 #---------------------------------------------------------------
 # project configuration and compiler options
 #
-CONFIG += debug 
+CONFIG += release
 CONFIG += warn_on
 CONFIG += C++11
 CONFIG += silent
@@ -184,8 +184,9 @@ win32 {
       message("Building '$$QMAKE_PROJECT_NAME' DEBUG version for Windows ...")
    } else {
       message("Building '$$QMAKE_PROJECT_NAME' RELEASE version for Windows ...")
-      DEFINES += QT_NO_WARNING_OUTPUT
-      DEFINES += QT_NO_DEBUG_OUTPUT
+#      DEFINES += QT_NO_WARNING_OUTPUT
+#      DEFINES += QT_NO_INFO_OUTPUT
+#      DEFINES += QT_NO_DEBUG_OUTPUT
    }
 
    RC_FILE += server.rc

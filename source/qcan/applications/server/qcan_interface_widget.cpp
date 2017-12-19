@@ -304,7 +304,7 @@ bool QCanInterfaceWidget::setInterface(QString clNameV)
    {
       foreach (QCanPlugin *pclPluginT, apclQCanPluginP)
       {
-         // if an interface habe been found quit here
+         // if an interface have been found quit here
          if (pclQCanInterfaceP != NULL)
          {
             break;
@@ -313,6 +313,7 @@ bool QCanInterfaceWidget::setInterface(QString clNameV)
          // check all interces of selected plugin
          for (uint8_t ubIfCntT = 0; ubIfCntT < pclPluginT->interfaceCount(); ubIfCntT++)
          {
+            qDebug() << "2te stelle....";
             pclInterfaceT = pclPluginT->getInterface(ubIfCntT);
             pclInterfaceT->connect();
             clInterfaceNameT = pclInterfaceT->name();
@@ -320,17 +321,25 @@ bool QCanInterfaceWidget::setInterface(QString clNameV)
 
             if (clNameV == clInterfaceNameT)
             {
+               qDebug() << "Reqeusted Interface found: " << clInterfaceNameT;
                pclQCanInterfaceP = pclInterfaceT;
                break;
             }
          }
       }
+   } else
+   {
+      qDebug() << "FAIL...";
    }
+
+   qDebug() << "emit interfaceChanged " << QString::number(ubInterfaceIdxP,10);
 
    emit interfaceChanged(ubInterfaceIdxP, pclQCanInterfaceP);
 
    if (clInterfaceNameT != NULL)
    {
+      qDebug() << "Set new Interface:" << clInterfaceNameT;
+
       return true;
    }
 
