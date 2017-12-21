@@ -34,21 +34,23 @@
 
 #include <QLibrary>
 #include <QDebug>
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+#include <QTimer>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 #include "cp_core.h"
 #include "cp_fifo.h"
 #include "cp_msg.h"
+#include "mc_usart.h"
 
 
 //----------------------------------------------------------------------------//
 // QCanPeakUsb                                                                //
 //                                                                            //
 //----------------------------------------------------------------------------//
-class QCanUsart
+class QCanUsart : public QObject
 {
-
+    Q_OBJECT
 private:
 
    QLibrary clCanLibP;
@@ -57,18 +59,31 @@ private:
    QCanUsart();
    QCanUsart(const QCanUsart &);
    QSerialPort    *pclSerialPortP;
+   QByteArray  clUartRcvBufP;
+   quint8 ubUsartPortP;
+
+   QTimer      clCliTimerP;
 
    QString clNameP;
+
+private slots:
+   void handleSerialPortError(QSerialPort::SerialPortError error);
+   void handleUartRcv(void);
 
 public:
    ~QCanUsart();
 
-   InitCpUsart();
-   ReleaseCpUsart();
+   // this functions will be called from cp_usart module
+   qint32 UsartDevInit(quint8 ubPortV, quint32 ulBaudV, quint8 ubModeV);
+   qint32 UsartDevRelease(quint8 ubPortV);
+   qint32 UsartDevSetDir(quint8 ubPortV, quint8 ubDirV);
+   qint32 UsartDevSetRcvBufferSize(quint8 ubPortV, quint32 ulSizeV);
+   qint32 UsartDevSetRcvHandler(quint8 ubPortV, UsartHandler_fn pfnHandler);
+   qint32 UsartDevSetTrmHandler(quint8 ubPortV, UsartHandler_fn pfnHandler);
+   qint32 UsartDevWrite(quint8 ubPortV, quint8 *pubBufferV, quint32 ulSizeV);
 
-   int open(QString name);
-   int close();
 
+   // this function will be called from plugin module
    CpStatus_tv CpUsartBitrate(CpPort_ts *ptsPortV, int32_t slNomBitRateV,
                               int32_t slDatBitRateV);
 
@@ -123,6 +138,7 @@ public:
    CpStatus_tv CpUsartStatistic(CpPort_ts *ptsPortV, CpStatistic_ts *ptsStatsV);
 
 
+   void setDeviceName(QString);
    // allow only one instance of PCAN Basic
    static QCanUsart & getInstance()
    {
@@ -130,7 +146,6 @@ public:
       return clInstanceS;
    }
 
-   void log(QString);
    // helper functions
    bool isAvailable (void);
    QString formatedError(CpStatus_tv tvErrorV);

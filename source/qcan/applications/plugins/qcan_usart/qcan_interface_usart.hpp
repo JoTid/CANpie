@@ -54,31 +54,11 @@ private:
    QCanStatistic_ts clStatisticP;
 
    /*!
-    * \brief readCAN
-    * \param clFrameR
-    * \param ubChannelV
-    * \return
-    *
-    * Read CAN message from peak USB device
+    * \brief ulUsartBitrateP
+    *  Holds bitrate of USART interface
     */
-   InterfaceError_e  readCAN(QByteArray &clDataR);
-
-   /*!
-    * \brief readFD
-    * \param clFrameR
-    * \param ubChannelV
-    * \return
-    *
-    * Read CAN FD message from peak USB device
-    */
-   InterfaceError_e  readFD(QByteArray &clDataR);
-
-   /*!
-    * \brief ubChannelP
-    * This value holds channel number of interface
-    */
-   uint16_t uwPCanChannelP;
-   uint16_t uwPCanBitrateP;
+   uint32_t ulUsartBitrateP;
+   uint32_t ulUsartModeP;
    CAN_Mode_e teCanModeP;
 
    QString  clDeviceNameP;
@@ -96,7 +76,6 @@ private:
     */
    bool btConnectedP;
 
-   bool btFdUsedP;
 
 //   void setupErrorFrame(TPCANStatus ulStatusV, QCanFrameError &clFrameR);
 

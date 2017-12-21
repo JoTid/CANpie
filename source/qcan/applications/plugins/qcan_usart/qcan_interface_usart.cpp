@@ -30,32 +30,28 @@
 
 
 //----------------------------------------------------------------------------//
-// QCanInterfaceUsart()                                                        //
+// QCanInterfaceUsart()                                                       //
 //                                                                            //
 //----------------------------------------------------------------------------//
 QCanInterfaceUsart::QCanInterfaceUsart(uint16_t uwDeviceNrV, QString clNameV)
 {
    if (!pclCpUsartP.isAvailable())
    {
-      qCritical() << "QCanInterfaceUsart(): PEAKBasic library is not available!";
+      qCritical() << "QCanInterfaceUsart(): USART interface is available!";
    }
 
    clDeviceNameP = clNameV;
    uwDeviceNumberP = uwDeviceNrV;
 
    //----------------------------------------------------------------
-   // setup PCAN Channel of this interface
+   // setup interface variables
    //
-//   uwPCanChannelP = uwPCanChannelV;
-//   uwPCanBitrateP = PCAN_BAUD_500K; // initial value
-//   teCanModeP = eCAN_MODE_STOP;
 
    btConnectedP = false;
-   btFdUsedP = false;
 }
 
 //----------------------------------------------------------------------------//
-// ~QCanInterfaceUsart()                                                       //
+// ~QCanInterfaceUsart()                                                      //
 //                                                                            //
 //----------------------------------------------------------------------------//
 QCanInterfaceUsart::~QCanInterfaceUsart()
@@ -64,10 +60,11 @@ QCanInterfaceUsart::~QCanInterfaceUsart()
 
    if (pclCpUsartP.isAvailable())
    {
-//      if (btConnectedP)
-//      {
-//         pclCpUsartP.pfnCAN_UninitializeP(uwPCanChannelP);
-//      }
+      if (btConnectedP)
+      {
+         btConnectedP = false;
+         pclCpUsartP.CpUsartDriverRelease(&tsPortP);
+      }
    }
 }
 
@@ -87,7 +84,8 @@ QCanInterface::InterfaceError_e QCanInterfaceUsart::connect(void)
    //
    if (pclCpUsartP.isAvailable())
    {
-      tvStatusT = pclCpUsartP.CpUsartDriverInit(uwDeviceNumberP,&tsPortP,0);
+      pclCpUsartP.setDeviceName(clDeviceNameP);
+      tvStatusT = pclCpUsartP.CpUsartDriverInit(uwDeviceNumberP+1,&tsPortP,0);
       if (tvStatusT == eCP_ERR_NONE)
       {
          btConnectedP = true;
@@ -176,7 +174,7 @@ QString QCanInterfaceUsart::name()
 //----------------------------------------------------------------------------//
 QCanInterface::InterfaceError_e  QCanInterfaceUsart::read(QByteArray &clDataR)
 {
-   qDebug() << "QCanInterfaceUsart::read()";
+//   qDebug() << "QCanInterfaceUsart::read()";
    if (!pclCpUsartP.isAvailable())
    {
       return eERROR_LIBRARY;
@@ -185,328 +183,136 @@ QCanInterface::InterfaceError_e  QCanInterfaceUsart::read(QByteArray &clDataR)
    //----------------------------------------------------------------
    // check channel have been connected
    //
-   #if QCAN_SUPPORT_CAN_FD > 0
-   if (btFdUsedP == true)
-   {
-      return readFD(clDataR);
-   }
-   #endif
-
-   return readCAN(clDataR);
-}
-
-//----------------------------------------------------------------------------//
-// readCAN()                                                                  //
-//                                                                            //
-//----------------------------------------------------------------------------//
-QCanInterface::InterfaceError_e  QCanInterfaceUsart::readCAN(QByteArray &clDataR)
-{
-//   qDebug() << "QCanInterfaceUsart::readCAN()";
-//   TPCANStatus       ulStatusT;
-//   uint8_t           ubCntT;
-//   TPCANMsg          tsCanMsgT;
-//   TPCANTimestamp    tsCanTimeStampT;
-//   uint32_t          ulMicroSecsT;
-//   QCanFrame         clCanFrameT;
-//   QCanFrameError    clErrFrameT;
-//   QCanTimeStamp     clTimeStampT;
+   //   qDebug() << "QCanInterfaceUsart::readCAN()";
+   //   TPCANStatus       ulStatusT;
+   //   uint8_t           ubCntT;
+   //   TPCANMsg          tsCanMsgT;
+   //   TPCANTimestamp    tsCanTimeStampT;
+   //   uint32_t          ulMicroSecsT;
+   //   QCanFrame         clCanFrameT;
+   //   QCanFrameError    clErrFrameT;
+   //   QCanTimeStamp     clTimeStampT;
 
 
 
    InterfaceError_e  clRetValueT = eERROR_FIFO_RCV_EMPTY;
 
-   
-   //----------------------------------------------------------------
-   // get next message from FIFO
-   //
-//   ulStatusT = pclCpUsartP.read(&tsCanMsgT, &tsCanTimeStampT);
 
-   
-//   //----------------------------------------------------------------
-//   // read message structure
-//   //
-//   if (ulStatusT == PCAN_ERROR_OK)
-//   {
-//      //--------------------------------------------------------
-//      // handle data depending on type
-//      //
-//      if((tsCanMsgT.MSGTYPE & PCAN_MESSAGE_STATUS) > 0)
-//      {
-//         //------------------------------------------------
-//         // this is a status message
-//         //
-//         clRetValueT = eERROR_FIFO_RCV_EMPTY;
-//      }
-//      else
-//      {
-//         //------------------------------------------------
-//         // Classical CAN frame with standard or
-//         // extended identifier
-//         //
-//         if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_EXTENDED)
-//         {
-//            clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_EXT);
-//         }
-//         else
-//         {
-//            clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_STD);
-//         }
-            
-//         //------------------------------------------------
-//         // Classical CAN remote frame
-//         //
-//         if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_RTR)
-//         {
-//            clCanFrameT.setRemote(true);
-//         }
-         
-//         //------------------------------------------------
-//         // copy the identifier
-//         //
-//         clCanFrameT.setIdentifier(tsCanMsgT.ID);
+      //----------------------------------------------------------------
+      // get next message from FIFO
+      //
+   //   ulStatusT = pclCpUsartP.read(&tsCanMsgT, &tsCanTimeStampT);
 
-//         //------------------------------------------------
-//         // copy the DLC
-//         //
-//         clCanFrameT.setDlc(tsCanMsgT.LEN);
 
-//         //------------------------------------------------
-//         // copy the data
-//         //
-//         for (ubCntT = 0; ubCntT < clCanFrameT.dataSize(); ubCntT++)
-//         {
-//            clCanFrameT.setData(ubCntT, tsCanMsgT.DATA[ubCntT]);
-//         }
+   //   //----------------------------------------------------------------
+   //   // read message structure
+   //   //
+   //   if (ulStatusT == PCAN_ERROR_OK)
+   //   {
+   //      //--------------------------------------------------------
+   //      // handle data depending on type
+   //      //
+   //      if((tsCanMsgT.MSGTYPE & PCAN_MESSAGE_STATUS) > 0)
+   //      {
+   //         //------------------------------------------------
+   //         // this is a status message
+   //         //
+   //         clRetValueT = eERROR_FIFO_RCV_EMPTY;
+   //      }
+   //      else
+   //      {
+   //         //------------------------------------------------
+   //         // Classical CAN frame with standard or
+   //         // extended identifier
+   //         //
+   //         if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_EXTENDED)
+   //         {
+   //            clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_EXT);
+   //         }
+   //         else
+   //         {
+   //            clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_STD);
+   //         }
 
-//         //------------------------------------------------
-//         // copy the time-stamp
-//         // the value is a multiple of 1 us and has a
-//         // total time span of 4294,9 secs
-//         //
-//         ulMicroSecsT = tsCanTimeStampT.millis * 1000;
-//         ulMicroSecsT = ulMicroSecsT + tsCanTimeStampT.micros;
-//         clTimeStampT.fromMicroSeconds(ulMicroSecsT);
-         
-//         clCanFrameT.setTimeStamp(clTimeStampT);
-         
-//         //------------------------------------------------
-//         // increase statistic counter
-//         //
-//         clStatisticP.ulRcvCount++;
-         
-//         //------------------------------------------------
-//         // copy the CAN frame to a byte array for transfer
-//         //
-//         clDataR = clCanFrameT.toByteArray();
-//      }
-//   }
+   //         //------------------------------------------------
+   //         // Classical CAN remote frame
+   //         //
+   //         if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_RTR)
+   //         {
+   //            clCanFrameT.setRemote(true);
+   //         }
 
-//   //----------------------------------------------------------------
-//   // test for bus error
-//   //
-//   else if ((ulStatusT & (TPCANStatus)PCAN_ERROR_ANYBUSERR) > 0)
-//   {
-//      setupErrorFrame(ulStatusT, clErrFrameT);
-//      //--------------------------------------------------------
-//      // copy the error frame to a byte array
-//      //
-//      clDataR = clErrFrameT.toByteArray();
-//   }
+   //         //------------------------------------------------
+   //         // copy the identifier
+   //         //
+   //         clCanFrameT.setIdentifier(tsCanMsgT.ID);
 
-//   //----------------------------------------------------------------
-//   // the receive queue is empty
-//   //
-//   else if (ulStatusT == PCAN_ERROR_QRCVEMPTY)
-//   {
-//      clRetValueT = eERROR_FIFO_RCV_EMPTY;
-//   }
+   //         //------------------------------------------------
+   //         // copy the DLC
+   //         //
+   //         clCanFrameT.setDlc(tsCanMsgT.LEN);
 
-//   //----------------------------------------------------------------
-//   // some other error
-//   //
-//   else
-//   {
-//      clRetValueT = eERROR_DEVICE;
-//   }
+   //         //------------------------------------------------
+   //         // copy the data
+   //         //
+   //         for (ubCntT = 0; ubCntT < clCanFrameT.dataSize(); ubCntT++)
+   //         {
+   //            clCanFrameT.setData(ubCntT, tsCanMsgT.DATA[ubCntT]);
+   //         }
+
+   //         //------------------------------------------------
+   //         // copy the time-stamp
+   //         // the value is a multiple of 1 us and has a
+   //         // total time span of 4294,9 secs
+   //         //
+   //         ulMicroSecsT = tsCanTimeStampT.millis * 1000;
+   //         ulMicroSecsT = ulMicroSecsT + tsCanTimeStampT.micros;
+   //         clTimeStampT.fromMicroSeconds(ulMicroSecsT);
+
+   //         clCanFrameT.setTimeStamp(clTimeStampT);
+
+   //         //------------------------------------------------
+   //         // increase statistic counter
+   //         //
+   //         clStatisticP.ulRcvCount++;
+
+   //         //------------------------------------------------
+   //         // copy the CAN frame to a byte array for transfer
+   //         //
+   //         clDataR = clCanFrameT.toByteArray();
+   //      }
+   //   }
+
+   //   //----------------------------------------------------------------
+   //   // test for bus error
+   //   //
+   //   else if ((ulStatusT & (TPCANStatus)PCAN_ERROR_ANYBUSERR) > 0)
+   //   {
+   //      setupErrorFrame(ulStatusT, clErrFrameT);
+   //      //--------------------------------------------------------
+   //      // copy the error frame to a byte array
+   //      //
+   //      clDataR = clErrFrameT.toByteArray();
+   //   }
+
+   //   //----------------------------------------------------------------
+   //   // the receive queue is empty
+   //   //
+   //   else if (ulStatusT == PCAN_ERROR_QRCVEMPTY)
+   //   {
+   //      clRetValueT = eERROR_FIFO_RCV_EMPTY;
+   //   }
+
+   //   //----------------------------------------------------------------
+   //   // some other error
+   //   //
+   //   else
+   //   {
+   //      clRetValueT = eERROR_DEVICE;
+   //   }
 
    return (clRetValueT);
 }
-
-
-//----------------------------------------------------------------------------//
-// readFD()                                                                   //
-//                                                                            //
-//----------------------------------------------------------------------------//
-#if QCAN_SUPPORT_CAN_FD > 0
-QCanInterface::InterfaceError_e  QCanInterfaceUsart::readFD(QByteArray &clDataR)
-{
-   qDebug() << "QCanInterfaceUsart::readFD()";
-
-   TPCANStatus       ulStatusT;
-   uint8_t           ubCntT;
-   TPCANMsgFD        tsCanMsgT;
-   TPCANTimestampFD  tsCanTimeStampT;
-   uint32_t          ulMicroSecsT;
-   QCanFrame         clCanFrameT;
-   QCanFrameError    clErrFrameT;
-   QCanTimeStamp     clTimeStampT;
-   InterfaceError_e  clRetValueT = eERROR_NONE;
-
-   //----------------------------------------------------------------
-   // get next message from FIFO
-   //
-   ulStatusT = pclCpUsartP.pfnCAN_ReadFDP(uwPCanChannelP, &tsCanMsgT,
-                                            &tsCanTimeStampT);
-
-
-   //----------------------------------------------------------------
-   // read message structure
-   //
-   if (ulStatusT == PCAN_ERROR_OK)
-   {
-      //--------------------------------------------------------
-      // handle data depending on type
-      //
-      if((tsCanMsgT.MSGTYPE & PCAN_MESSAGE_STATUS) > 0)
-      {
-         //------------------------------------------------
-         // this is a status message
-         //
-         clRetValueT = eERROR_FIFO_RCV_EMPTY;
-      }
-      else
-      {
-         //------------------------------------------------
-         // this is a CAN message
-         //
-         if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_FD)
-         {
-            //----------------------------------------
-            // ISO CAN FD frame with standard or
-            // extended identifier
-            //
-            if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_EXTENDED)
-            {
-               clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_FD_EXT);
-            }
-            else
-            {
-               clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_FD_STD);
-            }
-
-            //----------------------------------------
-            // Test for BRS bit
-            //
-            if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_BRS)
-            {
-               clCanFrameT.setBitrateSwitch();
-            }
-
-            //----------------------------------------
-            // Test for ESI bit
-            //
-            if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_ESI)
-            {
-               clCanFrameT.setErrorStateIndicator();
-            }
-         }
-         else
-         {
-            //----------------------------------------
-            // Classical CAN frame with standard or
-            // extended identifier
-            //
-            if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_EXTENDED)
-            {
-               clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_EXT);
-            }
-            else
-            {
-               clCanFrameT.setFrameFormat(QCanFrame::eFORMAT_CAN_STD);
-            }
-
-            //----------------------------------------
-            // Classical CAN remote frame
-            //
-            if (tsCanMsgT.MSGTYPE & PCAN_MESSAGE_RTR)
-            {
-               clCanFrameT.setRemote();
-            }
-         }
-
-         //------------------------------------------------
-         // copy the identifier
-         //
-         clCanFrameT.setIdentifier(tsCanMsgT.ID);
-
-         //------------------------------------------------
-         // copy the DLC
-         //
-         clCanFrameT.setDlc(tsCanMsgT.DLC);
-
-         //------------------------------------------------
-         // copy the data
-         //
-         for (ubCntT = 0; ubCntT < clCanFrameT.dataSize(); ubCntT++)
-         {
-            clCanFrameT.setData(ubCntT, tsCanMsgT.DATA[ubCntT]);
-         }
-
-         //------------------------------------------------
-         // copy the time-stamp
-         // the value is a multiple of 1 us and has a
-         // total time span of 4294,9 secs
-         //
-         /*
-         ulMicroSecsT = tsCanTimeStampT.millis * 1000;
-         ulMicroSecsT = ulMicroSecsT + tsCanTimeStampT.micros;
-         clTimeStampT.fromMicroSeconds(ulMicroSecsT);
-
-         clCanFrameT.setTimeStamp(clTimeStampT);
-         */
-
-         //------------------------------------------------
-         // increase statistic counter
-         //
-         clStatisticP.ulRcvCount++;
-
-         //------------------------------------------------
-         // copy the CAN frame to a byte array for transfer
-         //
-         clDataR = clCanFrameT.toByteArray();
-      }
-   }
-   else
-   {
-      //--------------------------------------------------------
-      // test for bus error
-      //
-      if ((ulStatusT & (TPCANStatus)PCAN_ERROR_ANYBUSERR) > 0)
-      {
-         setupErrorFrame(ulStatusT, clErrFrameT);
-         //------------------------------------------------
-         // copy the error frame to a byte array
-         //
-         clDataR = clErrFrameT.toByteArray();
-      }
-
-      //--------------------------------------------------------
-      // the receive queue is empty
-      //
-      else if (ulStatusT == PCAN_ERROR_QRCVEMPTY)
-      {
-         clRetValueT = eERROR_FIFO_RCV_EMPTY;
-      }
-      else
-      {
-         clRetValueT = eERROR_DEVICE;
-      }
-   }
-
-   return (clRetValueT);
-}
-#endif
-
 
 //----------------------------------------------------------------------------//
 // reset()                                                                    //
@@ -531,26 +337,15 @@ QCanInterface::InterfaceError_e  QCanInterfaceUsart::reset()
    clStatisticP.ulRcvCount = 0;
    clStatisticP.ulTrmCount = 0;
 
-//   //----------------------------------------------------------------
-//   // reset device
-//   //
-//   if (pclCpUsartP.pfnCAN_ResetP(uwPCanChannelP) != PCAN_ERROR_OK)
-//   {
-//      return eERROR_DEVICE;
-//   }
-
    //----------------------------------------------------------------
    // perform a hardware reset only if
    // it hase been initialised before
    //
    if (btConnectedP)
    {
-//      pclCpUsartP.pfnCAN_UninitializeP(uwPCanChannelP);
-
-//      if (pclCpUsartP.pfnCAN_InitializeP(uwPCanChannelP, uwPCanBitrateP, 0, 0, 0) != PCAN_ERROR_OK)
-//      {
-//         return eERROR_DEVICE;
-//      }
+      disconnect();
+      connect();
+      setBitrate(ulUsartBitrateP,eCP_BITRATE_NONE);
    }
 
    return setMode(teCanModeP);
@@ -568,9 +363,13 @@ QCanInterface::InterfaceError_e QCanInterfaceUsart::setBitrate(int32_t slNomBitR
 
    qDebug() << "QCanInterfaceUsart::setBitrate()";
 
-   if (!pclCpUsartP.isAvailable())
+   if (pclCpUsartP.isAvailable())
    {
-      tvStatusT = pclCpUsartP.CpUsartBitrate(&tsPortP,slNomBitRateV,slDatBitRateV);
+      slNomBitRateV = eCP_BITRATE_125K;
+      slDatBitRateV = eCP_BITRATE_NONE;
+
+      ulUsartBitrateP = slNomBitRateV;
+      tvStatusT = pclCpUsartP.CpUsartBitrate(&tsPortP, slNomBitRateV, slDatBitRateV);
       if (tvStatusT == eCP_ERR_NONE)
       {
          teReturnT = eERROR_NONE;
@@ -592,86 +391,54 @@ QCanInterface::InterfaceError_e QCanInterfaceUsart::setBitrate(int32_t slNomBitR
 QCanInterface::InterfaceError_e	QCanInterfaceUsart::setMode(const CAN_Mode_e teModeV)
 {
    uint8_t ubValueBufT;
+   CpStatus_tv tvStatusT;
 
     qDebug() << "QCanInterfaceUsart::setMode()";
 
-//   //----------------------------------------------------------------
-//   // check lib is available
-//   //
-//   if (!pclCpUsartP.isAvailable())
-//   {
-//      return eERROR_LIBRARY;
-//   }
+   //----------------------------------------------------------------
+   // check lib is available
+   //
+   if (!pclCpUsartP.isAvailable())
+   {
+      return eERROR_LIBRARY;
+   }
 
-//   //----------------------------------------------------------------
-//   // select mode
-//   //
-//   switch (teModeV)
-//   {
-//      case eCAN_MODE_START :
+   //----------------------------------------------------------------
+   // select mode
+   //
+   switch (teModeV)
+   {
+      case eCAN_MODE_START :
 
-//         //---------------------------------------------------
-//         // reset statistic values
-//         //
-//         clStatisticP.ulErrCount = 0;
-//         clStatisticP.ulRcvCount = 0;
-//         clStatisticP.ulTrmCount = 0;
+         //---------------------------------------------------
+         // reset statistic values
+         //
+         clStatisticP.ulErrCount = 0;
+         clStatisticP.ulRcvCount = 0;
+         clStatisticP.ulTrmCount = 0;
 
-//         ubValueBufT = 1;
-//         if (pclCpUsartP.pfnCAN_SetValueP(uwPCanChannelP, PCAN_BUSOFF_AUTORESET,&ubValueBufT,sizeof(ubValueBufT)))
-//         {
-//            qWarning() << "WARNING: Fail to set AutoReset of Device!";
-//         }
-//         teCanModeP = eCAN_MODE_START;
-//         break;
+         ubValueBufT = eCP_BUFFER_1;
+         tvStatusT = pclCpUsartP.CpUsartCanMode(&tsPortP, eCAN_MODE_START);
+         if (tvStatusT == eCP_ERR_NONE)
+         {
+            teCanModeP = eCAN_MODE_START;
+         } else
+         {
+            qWarning() << QString("QCanInterfaceUsart::setMode(0x" +QString::number(tsPortP.ubPhyIf,16)+", "+clDeviceNameP+")") << "fail with error:" << pclCpUsartP.formatedError(tvStatusT);
+         }
+         break;
 
-//      case eCAN_MODE_STOP :
-//         teCanModeP = eCAN_MODE_STOP;
-//         break;
+      case eCAN_MODE_STOP :
+         teCanModeP = eCAN_MODE_STOP;
+         break;
 
-//      default :
-//         return eERROR_MODE;
-//         break;
-//   }
+      default :
+         return eERROR_MODE;
+         break;
+   }
 
    return eERROR_NONE;
 }
-
-////----------------------------------------------------------------------------//
-//// setupErrorFrame()                                                           //
-////                                                                            //
-////----------------------------------------------------------------------------//
-//void QCanInterfaceUsart::setupErrorFrame(TPCANStatus ulStatusV,
-//                                        QCanFrameError &clFrameR)
-//{
-
-//   //---------------------------------------------------------
-//   // set frame type and the bus status
-//   //
-//   clFrameR.setErrorType(QCanFrameError::eERROR_TYPE_NONE);
-
-//   switch (ulStatusV)
-//   {
-//      case PCAN_ERROR_BUSLIGHT :
-//         clFrameR.setErrorState(eCAN_STATE_BUS_WARN);
-//         break;
-//      case PCAN_ERROR_BUSWARNING :
-//         clFrameR.setErrorState(eCAN_STATE_BUS_WARN);
-//         break;
-//      case PCAN_ERROR_BUSPASSIVE :
-//         clFrameR.setErrorState(eCAN_STATE_BUS_PASSIVE);
-//         break;
-//      case PCAN_ERROR_BUSOFF :
-//         clFrameR.setErrorState(eCAN_STATE_BUS_OFF);
-//         break;
-
-//      default :
-//         clFrameR.setErrorState(eCAN_STATE_BUS_ACTIVE);
-//         break;
-//   }
-
-//}
-
 
 //----------------------------------------------------------------------------//
 // statistic()                                                                //
@@ -679,9 +446,17 @@ QCanInterface::InterfaceError_e	QCanInterfaceUsart::setMode(const CAN_Mode_e teM
 //----------------------------------------------------------------------------//
 QCanInterface::InterfaceError_e	QCanInterfaceUsart::statistic(QCanStatistic_ts &clStatisticR)
 {
-   //! \todo
+   if(pclCpUsartP.isAvailable())
+   {
+      clStatisticR.ulErrCount = clStatisticP.ulErrCount;
+      clStatisticR.ulRcvCount = clStatisticP.ulRcvCount;
+      clStatisticR.ulTrmCount = clStatisticP.ulTrmCount;
+   }
+   else
+   {
+      return(eERROR_LIBRARY);
+   }
 
-   clStatisticR.ulErrCount = 0;
 
    return(eERROR_NONE);
 }
@@ -693,30 +468,13 @@ QCanInterface::InterfaceError_e	QCanInterfaceUsart::statistic(QCanStatistic_ts &
 //----------------------------------------------------------------------------//
 uint32_t QCanInterfaceUsart::supportedFeatures()
 {
+   uint32_t ulFeaturesT = 0;
+
    qDebug() << "QCanInterfaceUsart::supportedFeatures()";
 
-   uint32_t ulFeaturesT = 0;
-   #if QCAN_SUPPORT_CAN_FD > 0
-   uint32_t ulBufferT = 0;
-   #endif
    if(pclCpUsartP.isAvailable())
    {
-
       ulFeaturesT = QCAN_IF_SUPPORT_LISTEN_ONLY;
-
-      #if QCAN_SUPPORT_CAN_FD > 0
-      TPCANStatus tsStatusT = pclCpUsartP.pfnCAN_GetValueP(uwPCanChannelP, PCAN_CHANNEL_FEATURES, (void*)&ulBufferT, sizeof(ulBufferT));
-      if (tsStatusT != PCAN_ERROR_OK)
-      {
-         qWarning() << QString("QCanInterfaceUsart::supportedFeatures(0x" +QString::number(uwPCanChannelP,16)+")") << "PCAN_CHANNEL_FEATURES fail with error:" << pclCpUsartP.formatedError(tsStatusT);
-      }
-      qWarning() << QString("QCanInterfaceUsart::supportedFeatures(0x" +QString::number(uwPCanChannelP,16)+")") << "PCAN_CHANNEL_FEATURES:" << QString::number(ulBufferT,16) << "[hex]";
-
-      if (ulBufferT & FEATURE_FD_CAPABLE)
-      {
-         ulFeaturesT += QCAN_IF_SUPPORT_CAN_FD;
-      }
-      #endif
    }
 
    return(ulFeaturesT);
@@ -727,7 +485,7 @@ uint32_t QCanInterfaceUsart::supportedFeatures()
 // write()                                                                    //
 //                                                                            //
 //----------------------------------------------------------------------------//
-QCanInterface::InterfaceError_e	QCanInterfaceUsart::write(const QCanFrame &clFrameR)
+QCanInterface::InterfaceError_e QCanInterfaceUsart::write(const QCanFrame &clFrameR)
 {
    qDebug() << "QCanInterfaceUsart::write()";
 
