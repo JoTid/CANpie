@@ -36,6 +36,7 @@
 #include <QIcon>
 #include "qcan_usart.hpp"
 
+#include "canpie.h"
 
 //----------------------------------------------------------------------------//
 // QCanPeakUsb                                                                //
@@ -80,7 +81,11 @@ private:
    uint16_t uwPCanBitrateP;
    CAN_Mode_e teCanModeP;
 
-   QString  clNameP;
+   QString  clDeviceNameP;
+   uint16_t uwDeviceNumberP;
+   CpPort_ts tsPortP;
+
+
    //----------------------------------------------------------------
    // Reference to the static PCAN Basic lib
    //
@@ -97,7 +102,7 @@ private:
 
 public:
 
-   QCanInterfaceUsart(QString clNameV);
+   QCanInterfaceUsart(uint16_t uwDevNrV, QString clNameV);
    ~QCanInterfaceUsart();
 
    InterfaceError_e  connect(void) Q_DECL_OVERRIDE;

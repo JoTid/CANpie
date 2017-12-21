@@ -41,6 +41,7 @@
 #include "cp_fifo.h"
 #include "cp_msg.h"
 
+
 //----------------------------------------------------------------------------//
 // QCanPeakUsb                                                                //
 //                                                                            //
@@ -57,56 +58,70 @@ private:
    QCanUsart(const QCanUsart &);
    QSerialPort    *pclSerialPortP;
 
-   //----------------------------------------------------------------
-   // Type definitions of PCANBasic.dll taken from PCANBasic.h
-   // (Last Change 24.04.2015)
-   //
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_Initialize_tf)     (TPCANHandle uwChannelV, TPCANBaudrate uwBtr0Btr1V, TPCANType ubHwTypeV, DWORD ulIOPortV, WORD uwInterruptV);
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_InitializeFD_tf)   (TPCANHandle uwChannelV, TPCANBitrateFD pszBitrateFDV);
-//   #endif
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_Uninitialize_tf)   (TPCANHandle uwChannelV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_Reset_tf)          (TPCANHandle uwChannelV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_GetStatus_tf)      (TPCANHandle uwChannelV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_Read_tf)           (TPCANHandle uwChannelV, TPCANMsg *ptsMessageBufferV, TPCANTimestamp *tsTimestampBufferV);
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_ReadFD_tf)         (TPCANHandle uwChannelV, TPCANMsgFD *ptsMessageBufferV, TPCANTimestampFD *puqTimestampBufferV);
-//   #endif
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_Write_tf)          (TPCANHandle uwChannelV, TPCANMsg *ptsMessageBufferV);
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_WriteFD_tf)        (TPCANHandle uwChannelV, TPCANMsgFD *ptsMessageBufferV);
-//   #endif
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_FilterMessages_tf) (TPCANHandle uwChannelV, DWORD ulFromIDV, DWORD ulToIDV, TPCANMode ubModeV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_GetValue_tf)       (TPCANHandle uwChannelV, TPCANParameter ubParameterV, void *pvdBufferV, DWORD ulBufferLengthV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_SetValue_tf)       (TPCANHandle uwChannelV, TPCANParameter ubParameterV, void *pvdBufferV, DWORD ulBufferLengthV);
-//   typedef TPCANStatus (DRV_CALLBACK_TYPE *CAN_GetErrorText_tf)   (TPCANStatus ulErrorV, WORD uwLanguageV, LPSTR pszBufferV);
-
+   QString clNameP;
 
 public:
    ~QCanUsart();
 
+   InitCpUsart();
+   ReleaseCpUsart();
+
    int open(QString name);
    int close();
-//   int read();
-//   CAN_Initialize_tf      pfnCAN_InitializeP;
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   CAN_InitializeFD_tf    pfnCAN_InitializeFDP;
-//   #endif
-//   CAN_Uninitialize_tf    pfnCAN_UninitializeP;
-//   CAN_Reset_tf           pfnCAN_ResetP;
-//   CAN_GetStatus_tf       pfnCAN_GetStatusP;
-//   CAN_Read_tf            pfnCAN_ReadP;
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   CAN_ReadFD_tf          pfnCAN_ReadFDP;
-//   #endif
-//   CAN_Write_tf           pfnCAN_WriteP;
-//   #if QCAN_SUPPORT_CAN_FD > 0
-//   CAN_WriteFD_tf         pfnCAN_WriteFDP;
-//   #endif
-//   CAN_FilterMessages_tf  pfnCAN_FilterMessagesP;
-//   CAN_GetValue_tf        pfnCAN_GetValueP;
-//   CAN_SetValue_tf        pfnCAN_SetValueP;
-//   CAN_GetErrorText_tf    pfnCAN_GetErrorTextP;
+
+   CpStatus_tv CpUsartBitrate(CpPort_ts *ptsPortV, int32_t slNomBitRateV,
+                              int32_t slDatBitRateV);
+
+   CpStatus_tv CpUsartBufferConfig(CpPort_ts *ptsPortV,
+                                  uint8_t   ubBufferIdxV,
+                                  uint32_t  ulIdentifierV,
+                                  uint32_t  ulAcceptMaskV,
+                                  uint8_t   ubFormatV,
+                                  uint8_t   ubDirectionV);
+
+   CpStatus_tv CpUsartBufferEnable(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                  uint8_t ubEnableV);
+   CpStatus_tv CpUsartBufferGetData(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                   uint8_t *pubDestDataV,
+                                   uint8_t   ubStartPosV,
+                                   uint8_t   ubSizeV);
+   CpStatus_tv CpUsartBufferGetDlc(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                  uint8_t *pubDlcV);
+   CpStatus_tv CpUsartBufferRelease(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV);
+   CpStatus_tv CpUsartBufferSend(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV);
+   CpStatus_tv CpUsartBufferSetData(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                   uint8_t *pubSrcDataV,
+                                   uint8_t   ubStartPosV,
+                                   uint8_t   ubSizeV);
+   CpStatus_tv CpUsartBufferSetDlc(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                  uint8_t ubDlcV);
+   CpStatus_tv CpUsartCanMode(CpPort_ts *ptsPortV, uint8_t ubModeV);
+   CpStatus_tv CpUsartCanState(CpPort_ts *ptsPortV, CpState_ts *ptsStateV);
+   CpStatus_tv CpUsartDriverInit(uint8_t ubPhyIfV, CpPort_ts *ptsPortV,
+                                uint8_t ubConfigV);
+
+   CpStatus_tv CpUsartDriverRelease(CpPort_ts *ptsPortV);
+   CpStatus_tv CpUsartFifoConfig(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                                CpFifo_ts *ptsFifoV);
+
+   void        CpUsartFifoEvent(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV);
+   CpStatus_tv CpUsartFifoRead(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                              CpCanMsg_ts *ptsCanMsgV,
+                              uint32_t *pulMsgCntV);
+
+   CpStatus_tv CpUsartFifoRelease(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV);
+   CpStatus_tv CpUsartFifoWrite(CpPort_ts *ptsPortV, uint8_t ubBufferIdxV,
+                               CpCanMsg_ts *ptsCanMsgV,
+                               uint32_t *pulMsgCntV);
+
+   CpStatus_tv CpUsartHDI(CpPort_ts *ptsPortV, CpHdi_ts *ptsHdiV);
+
+   CpStatus_tv CpUsartIntFunctions(CpPort_ts *ptsPortV,
+                                  CpRcvHandler_Fn pfnRcvHandlerV,
+                                  CpTrmHandler_Fn pfnTrmHandlerV,
+                                  CpErrHandler_Fn pfnErrHandlerV);
+   CpStatus_tv CpUsartStatistic(CpPort_ts *ptsPortV, CpStatistic_ts *ptsStatsV);
+
 
    // allow only one instance of PCAN Basic
    static QCanUsart & getInstance()
@@ -115,9 +130,10 @@ public:
       return clInstanceS;
    }
 
+   void log(QString);
    // helper functions
    bool isAvailable (void);
-//   QString formatedError(TPCANStatus tvErrorV);
+   QString formatedError(CpStatus_tv tvErrorV);
 };
 
 #endif /*QCAN_USART_H_*/

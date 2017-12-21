@@ -27,7 +27,101 @@
 //============================================================================//
 
 #include "qcan_usart.hpp"
+#include "mc_usart.h"
 
+int32_t McUsartInit(uint8_t ubPortV, uint32_t ulBaudV, uint8_t ubModeV)
+{
+   QCanUsart &pclCanUsartT = QCanUsart::getInstance();
+
+   pclCanUsartT.InitCpUsart();
+   
+   pclCanUsartT.log("McUsartInit() have been called ");
+
+
+}
+
+int32_t McUsartSetRcvBufferSize(uint8_t ubPortV, uint32_t ulSizeV)
+{
+
+}
+
+int32_t McUsartSetDir(uint8_t ubPortV, uint8_t ubDirV)
+{
+}
+
+int32_t McUsartRelease(uint8_t ubPortV)
+{
+
+
+}
+
+int32_t McUsartWrite(uint8_t ubPortV, uint8_t *pubBufferV, uint32_t ulSizeV)
+{
+
+}
+
+int32_t McUsartSetRcvHandler(uint8_t ubPortV, UsartHandler_fn pfnHandler)
+{
+
+}
+
+int32_t McUsartSetTrmHandler(uint8_t ubPortV, UsartHandler_fn pfnHandler)
+{
+
+}
+void QCanUsart::log(QString clStringV)
+{
+   qDebug() << ":::::::::::::::::"<< clStringV;
+}
+
+QCanUsart::ReleaseCpUsart()
+{
+   QCanUsart &pclCanUsartT = QCanUsart::getInstance();
+   // Releasing of port seem not to work.
+   if (pclCanUsartT.pclSerialPortP != NULL)
+   {
+      pclCanUsartT.pclSerialPortP->close();
+      delete(pclCanUsartT.pclSerialPortP);
+
+      pclCanUsartT.pclSerialPortP = NULL;
+   }
+}
+
+QCanUsart::InitCpUsart()
+{
+   // Releasing of port seem not to work.
+   if (pclSerialPortP != NULL)
+   {
+      pclSerialPortP->close();
+      delete(pclSerialPortP);
+   }
+
+   pclSerialPortP = new QSerialPort();
+
+   pclSerialPortP->setPortName(clNameP);
+   pclSerialPortP->setBaudRate(115200,QSerialPort::AllDirections);
+   pclSerialPortP->setDataBits(QSerialPort::Data8);
+   pclSerialPortP->setParity(QSerialPort::EvenParity);
+   pclSerialPortP->setStopBits(QSerialPort::OneStop);
+   pclSerialPortP->setFlowControl(QSerialPort::NoFlowControl);
+   if (pclSerialPortP->open(QIODevice::ReadWrite))
+   {
+      qDebug() << "   SUCCESS!!!";
+//      log(McLog::eLOG_DEBUG, (tr("Serial COM Port: ") + pclSerialPortP->portName() + " opened!"));
+      return 0;
+
+   } else
+   {
+//       QMessageBox::critical(this, tr("Error"), serial->errorString());
+
+//      log(McLog::eLOG_DEBUG, tr("Fail to OPEN ") + pclSerialPortP->portName());
+//      log(McLog::eLOG_DEBUG, pclSerialPortP->errorString());
+      qDebug() << "   FAIL: " << pclSerialPortP->error();
+
+//       ui->statusBar->showMessage(tr("Open error"));
+      return -1;
+   }
+}
 //----------------------------------------------------------------------------//
 // QCanUsart()                                                                //
 //                                                                            //
@@ -235,68 +329,41 @@ int QCanUsart::close()
    }
 }
 
-int QCanUsart::open(QString clNameV)
+CpPort_ts tsCpPortG;
+
+CpStatus_tv QCanUsart::CpUsartBitrate(CpPort_ts *ptsPortV, int32_t slNomBitRateV,
+                           int32_t slDatBitRateV)
 {
-   // Releasing of port seem not to work.
-   if (pclSerialPortP != NULL)
-   {
-      pclSerialPortP->close();
-      delete(pclSerialPortP);
-   }
-
-   pclSerialPortP = new QSerialPort();
-
-   pclSerialPortP->setPortName(clNameV);
-   pclSerialPortP->setBaudRate(115200,QSerialPort::AllDirections);
-   pclSerialPortP->setDataBits(QSerialPort::Data8);
-   pclSerialPortP->setParity(QSerialPort::EvenParity);
-   pclSerialPortP->setStopBits(QSerialPort::OneStop);
-   pclSerialPortP->setFlowControl(QSerialPort::NoFlowControl);
-   if (pclSerialPortP->open(QIODevice::ReadWrite))
-   {
-      qDebug() << "   SUCCESS!!!";
-//      log(McLog::eLOG_DEBUG, (tr("Serial COM Port: ") + pclSerialPortP->portName() + " opened!"));
-      return 0;
-
-   } else
-   {
-//       QMessageBox::critical(this, tr("Error"), serial->errorString());
-
-//      log(McLog::eLOG_DEBUG, tr("Fail to OPEN ") + pclSerialPortP->portName());
-//      log(McLog::eLOG_DEBUG, pclSerialPortP->errorString());
-      qDebug() << "   FAIL: " << pclSerialPortP->error();
-
-//       ui->statusBar->showMessage(tr("Open error"));
-      return -1;
-   }
+//   return (CpCoreBitrate(ptsPortV, eCP_BITRATE_125K, eCP_BITRATE_NONE));
+   return eCP_ERR_NONE;
 }
 
-////----------------------------------------------------------------------------//
-//// formatedError()                                                            //
-////                                                                            //
-////----------------------------------------------------------------------------//
-//QString QCanUsart::formatedError(TPCANStatus tvErrorV)
-//{
-//   TPCANStatus tvStatusT;
-//   char aszBufferT[256];
-//   QString clResultT;
+CpStatus_tv QCanUsart::CpUsartDriverInit(uint8_t ubPhyIfV, CpPort_ts *ptsPortV, uint8_t ubConfigV)
+{
+//   clNameP = clNameV;
+   qDebug() << "...........................................QCanUsart::open: "<< QString::number(ubPhyIfV,10);
+   qDebug() << "CpCoreDriverInit() => " << QString::number(CpCoreDriverInit(ubPhyIfV+1, ptsPortV, ubConfigV),16);
+   qDebug() << "CpCoreBitrate() => " << QString::number(CpCoreBitrate(ptsPortV,eCP_BITRATE_125K, eCP_BITRATE_NONE),16);
+   return eCP_ERR_NONE;
 
-//   memset(aszBufferT,'\0',256);
+}
 
-//   // Gets the text using the GetErrorText API function
-//   // If the function success, the translated error is returned. If it fails,
-//   // a text describing the current error is returned.
-//   //
+CpStatus_tv QCanUsart::CpUsartDriverRelease(CpPort_ts *ptsPortV)
+{
+   return (CpCoreDriverRelease(ptsPortV));
+}
 
-//   tvStatusT = pfnCAN_GetErrorTextP(tvErrorV,0x00,aszBufferT);
-//   if(tvStatusT != PCAN_ERROR_OK)
-//   {
-//      clResultT = ("An error ocurred. Error-code's text ("+ QString::number(tvErrorV,16).toUpper() + "h) couldn't be retrieved");
-//   } else
-//   {
-//      clResultT = QString::number(tvErrorV,16).toUpper() + "h : " + QLatin1String(aszBufferT);
-//   }
 
-//   return clResultT;
-//}
+//----------------------------------------------------------------------------//
+// formatedError()                                                            //
+//                                                                            //
+//----------------------------------------------------------------------------//
+QString QCanUsart::formatedError(CpStatus_tv tvErrorV)
+{
+   QString clResultT;
+
+   clResultT = ("An error ocurred. Error-code's text ("+ QString::number(tvErrorV,16).toUpper() + "h) couldn't be retrieved");
+
+   return clResultT;
+}
 

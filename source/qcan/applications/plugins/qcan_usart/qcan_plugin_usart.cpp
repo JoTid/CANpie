@@ -193,6 +193,7 @@ uint8_t QCanPluginUsart::interfaceCount()
    QString clPortNameT;
 //   QclPortNameT.clear();
    QSerialPort *pclSerialPort;
+   uint16_t uwDeviceNrT = 0;
    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
    {
       //clPortListT.append(info.portName());
@@ -231,8 +232,8 @@ uint8_t QCanPluginUsart::interfaceCount()
          // than append new entry
          if (btIfIsInListT == false)
          {
-            tsCanIfEntryT.uwPCanChannel = 0;
-            tsCanIfEntryT.pclQCanInterfaceUsart = new QCanInterfaceUsart(clPortNameT);
+            tsCanIfEntryT.uwPCanChannel = uwDeviceNrT ;
+            tsCanIfEntryT.pclQCanInterfaceUsart = new QCanInterfaceUsart(uwDeviceNrT, clPortNameT);
             atsQCanIfUsartP.append(tsCanIfEntryT);
 
             qInfo() << "QCanPluginUsart::QCanPluginUsart() INFO: Add Interface" <<

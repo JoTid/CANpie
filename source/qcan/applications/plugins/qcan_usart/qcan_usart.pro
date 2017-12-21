@@ -71,7 +71,7 @@ VERSION = 0.82.1
 #---------------------------------------------------------------
 # definitions for preprocessor
 #
-DEFINES =
+DEFINES  = MC_USART_PORT_MAX=CP_CHANNEL_MAX
 
 #---------------------------------------------------------------
 # UI files
@@ -88,6 +88,9 @@ RESOURCES = qcan_usart.qrc
 #
 INCLUDEPATH  = .
 INCLUDEPATH += ./include
+INCLUDEPATH += ./include/canpie-fd
+INCLUDEPATH += ./include/hal
+INCLUDEPATH += ./include/misc
 INCLUDEPATH += ./../../..
 
 
@@ -96,6 +99,7 @@ INCLUDEPATH += ./../../..
 #
 VPATH  = .
 VPATH += ./../../..
+VPATH += ./include/canpie-fd
 
 
 #---------------------------------------------------------------
@@ -120,6 +124,10 @@ SOURCES =   qcan_data.cpp           \
             qcan_usart.cpp     \
             qcan_plugin_usart.cpp
 
+
+SOURCES += cp_fifo.c    \
+           cp_msg.c     \
+           cp_usart.c
 
 EXAMPLE_FILES = plugin.json
 
