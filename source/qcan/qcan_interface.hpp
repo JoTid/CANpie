@@ -2,7 +2,7 @@
 // File:          qcan_interface.hpp                                          //
 // Description:   Virtual CAN interface class                                 //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -31,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 /*!
-** \file    qcan_can_interface.hpp
+** \file    qcan_interface.hpp
 ** \brief   CAN interface class
 **
 */
@@ -117,9 +124,10 @@ public:
    virtual InterfaceError_e connect(void) = 0;
 
    /*!
+   ** \return     \c true if connection is possible
    ** \see connected()
    **
-   ** Returns true if interface is connected.
+   ** The function returns \c true if the interface is connected.
    */
    virtual bool connected(void) = 0;
 
@@ -148,12 +156,12 @@ public:
    virtual QString name(void) = 0;
 
    /*!
+   ** \param[out] clDataR  Message stream
    ** \return     Status code defined by InterfaceError_e
    ** \see        read()
    **
-   ** The functions reads a CAN message from the physical channel
-   ** \c ubChannelV of the CAN interface. The first CAN channel starts at
-   ** index 0.
+   ** The functions reads a CAN message (data or error frame) from the 
+   ** CAN interface. The data is copied to the QByteArray \a clDataR.
    ** If no message is available, the function will return the value
    ** eERROR_FIFO_RCV_EMPTY. On success the function returns eERROR_NONE.
    **
@@ -184,11 +192,12 @@ public:
 
 
    /*!
+   ** \param[in]  teModeV CAN mode 
    ** \return     Status code defined by InterfaceError_e
    **
-   ** Set mode of the physical interface.
+   ** Set mode of the physical CAN interface.
    */
-   virtual InterfaceError_e	setMode(const CAN_Mode_e teModeV) = 0;
+   virtual InterfaceError_e	   setMode(const CAN_Mode_e teModeV) = 0;
 
 
    virtual InterfaceError_e   statistic(QCanStatistic_ts &clStatisticR) = 0;
@@ -204,15 +213,16 @@ public:
 	
 
    /*!
+   ** \param[in]  clFrameR CAN data frame
    ** \return     Status code defined by InterfaceError_e
    ** \see        read()
    **
-   ** The functions writes a CAN message to the physical CAN interface
-   ** \c ubChannelV of the CAN interface. The first CAN channel starts at
-   ** index 0. On success the function returns eERROR_NONE.
+   ** The functions writes a CAN message (data frame) to the 
+   ** CAN interface. The CAN frame data is defined by the parameter 
+   ** \a clFrameR. On success the function returns eERROR_NONE.
    **
    */
-   virtual InterfaceError_e	write(const QCanFrame &clFrameR) = 0;
+   virtual InterfaceError_e   	write(const QCanFrame &clFrameR) = 0;
 
 
 

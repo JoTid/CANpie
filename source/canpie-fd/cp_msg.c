@@ -2,7 +2,7 @@
 // File:          cp_msg.c                                                    //
 // Description:   CANpie message access functions                             //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -54,23 +61,23 @@
 // CpMsgClear()                                                               //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgClear(CpCanMsg_ts * ptsCanMsgV)
+void  CpMsgClear(CpCanMsg_ts *ptsCanMsgV)
 {
    uint8_t  ubDataCntT = (uint8_t) 0;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // clear all fields of the structure
       //
       ptsCanMsgV->ulIdentifier        = 0UL;
 
-      for(ubDataCntT = 0; ubDataCntT < (uint8_t) CP_DATA_SIZE; ubDataCntT++)
+      for (ubDataCntT = 0; ubDataCntT < (uint8_t) CP_DATA_SIZE; ubDataCntT++)
       {
-         ptsCanMsgV->aubData[ubDataCntT] = (uint8_t) 0;
+         ptsCanMsgV->tuMsgData.aubByte[ubDataCntT] = (uint8_t) 0;
       }
 
       ptsCanMsgV->ubMsgDLC             = (uint8_t) 0;
@@ -99,12 +106,12 @@ void  CpMsgClear(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgClrOverrun()                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void CpMsgClrOverrun(CpCanMsg_ts * ptsCanMsgV)
+void CpMsgClrOverrun(CpCanMsg_ts *ptsCanMsgV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // clear overrun bit
@@ -118,12 +125,12 @@ void CpMsgClrOverrun(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgClrRemote()                                                           //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void CpMsgClrRemote(CpCanMsg_ts * ptsCanMsgV)
+void CpMsgClrRemote(CpCanMsg_ts *ptsCanMsgV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // clear remote bit
@@ -138,30 +145,30 @@ void CpMsgClrRemote(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgGetData()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-uint8_t  CpMsgGetData(const CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV)
+uint8_t  CpMsgGetData(const CpCanMsg_ts *ptsCanMsgV, uint8_t ubPosV)
 {
    uint8_t  ubDataT = (uint8_t) 0;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // test ubPosV parameter
       //
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
       {
-         if(ubPosV < 64)
+         if (ubPosV < 64)
          {
-            ubDataT = ptsCanMsgV->aubData[ubPosV];
+            ubDataT = ptsCanMsgV->tuMsgData.aubByte[ubPosV];
          }
       }
       else
       {
-         if(ubPosV <  8)
+         if (ubPosV <  8)
          {
-            ubDataT = ptsCanMsgV->aubData[ubPosV];
+            ubDataT = ptsCanMsgV->tuMsgData.aubByte[ubPosV];
          }
       }
    }
@@ -170,7 +177,7 @@ uint8_t  CpMsgGetData(const CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV)
    //----------------------------------------------------------------
    // return data
    //
-   return(ubDataT);
+   return (ubDataT);
 }
 
 
@@ -178,19 +185,19 @@ uint8_t  CpMsgGetData(const CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV)
 // CpMsgGetDlc()                                                              //
 //                                                                            //
 //----------------------------------------------------------------------------//
-uint8_t  CpMsgGetDlc(const CpCanMsg_ts * ptsCanMsgV)
+uint8_t  CpMsgGetDlc(const CpCanMsg_ts *ptsCanMsgV)
 {
    uint8_t  ubDlcT = 0;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       ubDlcT = ptsCanMsgV->ubMsgDLC;
    }
 
-   return(ubDlcT);
+   return (ubDlcT);
 }
 
 
@@ -198,14 +205,14 @@ uint8_t  CpMsgGetDlc(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgGetExtId()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-uint32_t  CpMsgGetExtId(const CpCanMsg_ts * ptsCanMsgV)
+uint32_t  CpMsgGetExtId(const CpCanMsg_ts *ptsCanMsgV)
 {
    uint32_t  ulExtIdT = 0UL;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // mask the lower 29 bits
@@ -213,7 +220,7 @@ uint32_t  CpMsgGetExtId(const CpCanMsg_ts * ptsCanMsgV)
       ulExtIdT = ptsCanMsgV->ulIdentifier & CP_MASK_EXT_FRAME;
    }
 
-   return(ulExtIdT);
+   return (ulExtIdT);
 }
 
 
@@ -221,7 +228,7 @@ uint32_t  CpMsgGetExtId(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgGetIdentifier()                                                       //
 //                                                                            //
 //----------------------------------------------------------------------------//
-uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV)
+uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts *ptsCanMsgV)
 {
    uint32_t  ulIdentifierT = 0UL;
 
@@ -237,7 +244,7 @@ uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV)
          //
          ulIdentifierT = ptsCanMsgV->ulIdentifier & CP_MASK_EXT_FRAME;
       }
-      else 
+      else
       {
          //-----------------------------------------------------
          // mask the lower 11 bits
@@ -254,22 +261,22 @@ uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgGetStdId()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-uint16_t  CpMsgGetStdId(const CpCanMsg_ts * ptsCanMsgV)
+uint16_t  CpMsgGetStdId(const CpCanMsg_ts *ptsCanMsgV)
 {
    uint16_t  uwStdIdT = (uint16_t) 0;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // mask the lower 11 bits
       //
-      uwStdIdT = (uint16_t) (ptsCanMsgV->ulIdentifier & CP_MASK_STD_FRAME);
+      uwStdIdT = (uint16_t)(ptsCanMsgV->ulIdentifier & CP_MASK_STD_FRAME);
    }
 
-   return(uwStdIdT);
+   return (uwStdIdT);
 }
 
 
@@ -277,14 +284,14 @@ uint16_t  CpMsgGetStdId(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgGetTime()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-CpTime_ts * CpMsgGetTime(CpCanMsg_ts * ptsCanMsgV)
+CpTime_ts *CpMsgGetTime(CpCanMsg_ts *ptsCanMsgV)
 {
-   CpTime_ts * ptsTimeT = CPP_NULL;
-   
+   CpTime_ts *ptsTimeT = CPP_NULL;
+
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       #if CP_CAN_MSG_TIME > 0
       /*@ -immediatetrans @*/
@@ -299,12 +306,12 @@ CpTime_ts * CpMsgGetTime(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgInit()                                                                //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgInit(CpCanMsg_ts * ptsCanMsgV, uint8_t ubFormatV)
+void  CpMsgInit(CpCanMsg_ts *ptsCanMsgV, uint8_t ubFormatV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // initialise identifier, DLC and frame format
@@ -320,25 +327,25 @@ void  CpMsgInit(CpCanMsg_ts * ptsCanMsgV, uint8_t ubFormatV)
 // CpMsgIsBitrateSwitch()                                                     //
 //                                                                            //
 //----------------------------------------------------------------------------//
-bool_t  CpMsgIsBitrateSwitch(const CpCanMsg_ts * ptsCanMsgV)
+bool_t  CpMsgIsBitrateSwitch(const CpCanMsg_ts *ptsCanMsgV)
 {
    bool_t btResultT = false;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
       {
-         if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_BRS_BIT) > 0)
+         if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_BRS_BIT) > 0)
          {
             btResultT = true;
          }
       }
    }
 
-   return(btResultT);
+   return (btResultT);
 }
 
 
@@ -346,22 +353,22 @@ bool_t  CpMsgIsBitrateSwitch(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgIsExtended()                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
-bool_t  CpMsgIsExtended(const CpCanMsg_ts * ptsCanMsgV)
+bool_t  CpMsgIsExtended(const CpCanMsg_ts *ptsCanMsgV)
 {
    bool_t btResultT = false;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_EXT_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_EXT_BIT) > 0)
       {
          btResultT = true;
       }
    }
 
-   return(btResultT);
+   return (btResultT);
 }
 
 
@@ -369,22 +376,22 @@ bool_t  CpMsgIsExtended(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgIsFastData()                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
-bool_t  CpMsgIsFastData(const CpCanMsg_ts * ptsCanMsgV)
+bool_t  CpMsgIsFastData(const CpCanMsg_ts *ptsCanMsgV)
 {
    bool_t btResultT = false;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
       {
          btResultT = true;
       }
    }
 
-   return(btResultT);
+   return (btResultT);
 }
 
 
@@ -392,22 +399,22 @@ bool_t  CpMsgIsFastData(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgIsOverrun()                                                           //
 //                                                                            //
 //----------------------------------------------------------------------------//
-bool_t  CpMsgIsOverrun(const CpCanMsg_ts * ptsCanMsgV)
+bool_t  CpMsgIsOverrun(const CpCanMsg_ts *ptsCanMsgV)
 {
    bool_t btResultT = false;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_OVR_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_OVR_BIT) > 0)
       {
          btResultT = true;
       }
    }
 
-   return(btResultT);
+   return (btResultT);
 }
 
 
@@ -415,22 +422,22 @@ bool_t  CpMsgIsOverrun(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgIsRemote()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-bool_t  CpMsgIsRemote(const CpCanMsg_ts * ptsCanMsgV)
+bool_t  CpMsgIsRemote(const CpCanMsg_ts *ptsCanMsgV)
 {
    bool_t btResultT = false;
 
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_RTR_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_RTR_BIT) > 0)
       {
          btResultT = true;
       }
    }
 
-   return(btResultT);
+   return (btResultT);
 }
 
 
@@ -438,12 +445,12 @@ bool_t  CpMsgIsRemote(const CpCanMsg_ts * ptsCanMsgV)
 // CpMsgSetBitrateSwitch()                                                    //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetBitrateSwitch(CpCanMsg_ts * ptsCanMsgV)
+void  CpMsgSetBitrateSwitch(CpCanMsg_ts *ptsCanMsgV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       ptsCanMsgV->ubMsgCtrl |= CP_MSG_CTRL_BRS_BIT;
    }
@@ -454,28 +461,28 @@ void  CpMsgSetBitrateSwitch(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgSetData()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetData(CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV)
+void  CpMsgSetData(CpCanMsg_ts *ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // test frame type
       //
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
       {
-         if(ubPosV < 64)
+         if (ubPosV < 64)
          {
-            ptsCanMsgV->aubData[ubPosV] = ubValueV;
+            ptsCanMsgV->tuMsgData.aubByte[ubPosV] = ubValueV;
          }
       }
       else
       {
-         if(ubPosV <  8)
+         if (ubPosV <  8)
          {
-            ptsCanMsgV->aubData[ubPosV] = ubValueV;
+            ptsCanMsgV->tuMsgData.aubByte[ubPosV] = ubValueV;
          }
       }
    }
@@ -486,26 +493,26 @@ void  CpMsgSetData(CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV)
 // CpMsgSetDlc()                                                              //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetDlc(CpCanMsg_ts * ptsCanMsgV, uint8_t ubDlcV)
+void  CpMsgSetDlc(CpCanMsg_ts *ptsCanMsgV, uint8_t ubDlcV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //--------------------------------------------------------
       // make sure the Data Length Code is in range
       //
-      if((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
+      if ((ptsCanMsgV->ubMsgCtrl & CP_MSG_CTRL_FDF_BIT) > 0)
       {
-         if(ubDlcV < 16)
+         if (ubDlcV < 16)
          {
             ptsCanMsgV->ubMsgDLC = ubDlcV;
          }
       }
       else
       {
-         if(ubDlcV <  9)
+         if (ubDlcV <  9)
          {
             ptsCanMsgV->ubMsgDLC = ubDlcV;
          }
@@ -518,12 +525,12 @@ void  CpMsgSetDlc(CpCanMsg_ts * ptsCanMsgV, uint8_t ubDlcV)
 // CpMsgSetExtId()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetExtId(CpCanMsg_ts * ptsCanMsgV, uint32_t ulExtIdV)
+void  CpMsgSetExtId(CpCanMsg_ts *ptsCanMsgV, uint32_t ulExtIdV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //----------------------------------------------------------------
       // use only lower 29 bits
@@ -544,7 +551,7 @@ void  CpMsgSetExtId(CpCanMsg_ts * ptsCanMsgV, uint32_t ulExtIdV)
 // CpMsgSetIdentifier()                                                       //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetIdentifier(CpCanMsg_ts * ptsCanMsgV, uint32_t ulIdentifierV)
+void  CpMsgSetIdentifier(CpCanMsg_ts *ptsCanMsgV, uint32_t ulIdentifierV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
@@ -558,7 +565,7 @@ void  CpMsgSetIdentifier(CpCanMsg_ts * ptsCanMsgV, uint32_t ulIdentifierV)
          //
          ptsCanMsgV->ulIdentifier = ulIdentifierV & CP_MASK_EXT_FRAME;
       }
-      else 
+      else
       {
          //-----------------------------------------------------
          // mask the lower 11 bits
@@ -573,12 +580,12 @@ void  CpMsgSetIdentifier(CpCanMsg_ts * ptsCanMsgV, uint32_t ulIdentifierV)
 // CpMsgSetOverrun()                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void CpMsgSetOverrun(CpCanMsg_ts * ptsCanMsgV)
+void CpMsgSetOverrun(CpCanMsg_ts *ptsCanMsgV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       ptsCanMsgV->ubMsgCtrl |= CP_MSG_CTRL_OVR_BIT;
    }
@@ -589,7 +596,7 @@ void CpMsgSetOverrun(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgSetRemote()                                                           //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetRemote(CpCanMsg_ts * ptsCanMsgV)
+void  CpMsgSetRemote(CpCanMsg_ts *ptsCanMsgV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
@@ -608,12 +615,12 @@ void  CpMsgSetRemote(CpCanMsg_ts * ptsCanMsgV)
 // CpMsgSetStdId()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetStdId(CpCanMsg_ts * ptsCanMsgV, uint16_t uwStdIdV)
+void  CpMsgSetStdId(CpCanMsg_ts *ptsCanMsgV, uint16_t uwStdIdV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       //----------------------------------------------------------------
       // use only lower 11 bits
@@ -635,12 +642,12 @@ void  CpMsgSetStdId(CpCanMsg_ts * ptsCanMsgV, uint16_t uwStdIdV)
 // CpMsgSetTime()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-void  CpMsgSetTime(CpCanMsg_ts * ptsCanMsgV, const CpTime_ts * ptsTimeV)
+void  CpMsgSetTime(CpCanMsg_ts *ptsCanMsgV, const CpTime_ts *ptsTimeV)
 {
    //----------------------------------------------------------------
    // check for valid pointer
    //
-   if(ptsCanMsgV != (CpCanMsg_ts *) 0L)
+   if (ptsCanMsgV != (CpCanMsg_ts *) 0L)
    {
       #if CP_CAN_MSG_TIME > 0
       ptsCanMsgV->tsMsgTime.ulSec1970 = (ptsTimeV->ulSec1970);

@@ -2,7 +2,7 @@
 // File:          cp_msg.h                                                    //
 // Description:   CANpie message access functions                             //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -114,7 +121,7 @@ extern "C" {                                                         //
 ** \deprecated It is advised to use CpMsgInit() for new applications.
 **
 */
-void  CpMsgClear(CpCanMsg_ts * ptsCanMsgV);
+void  CpMsgClear(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -125,7 +132,7 @@ void  CpMsgClear(CpCanMsg_ts * ptsCanMsgV);
 **
 ** This function clears the Overrun bit (RTR).
 */
-void  CpMsgClrOverrun(CpCanMsg_ts * ptsCanMsgV);
+void  CpMsgClrOverrun(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -136,7 +143,7 @@ void  CpMsgClrOverrun(CpCanMsg_ts * ptsCanMsgV);
 **
 ** This function clears the Remote Transmission bit (RTR).
 */
-void  CpMsgClrRemote(CpCanMsg_ts * ptsCanMsgV);
+void  CpMsgClrRemote(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -149,10 +156,10 @@ void  CpMsgClrRemote(CpCanMsg_ts * ptsCanMsgV);
 ** This functions retrieves the data of a CAN message. The parameter
 ** \c ubPosV must be within the range 0 .. 7 for Classical CAN frames. For
 ** ISO CAN FD frames the valid range is 0 .. 63. Please note that the
-** macro implementation does not check the value range of the parameter 
+** macro implementation does not check the value range of the parameter
 ** \c ubPosV.
 */
-uint8_t  CpMsgGetData(const CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV);
+uint8_t  CpMsgGetData(const CpCanMsg_ts *ptsCanMsgV, uint8_t ubPosV);
 
 
 //------------------------------------------------------------------------------
@@ -162,9 +169,9 @@ uint8_t  CpMsgGetData(const CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV);
 ** \return  Data Length Code (DLC) of CAN message
 **
 ** This function retrieves the data length code (DLC) of a CAN message.
-** The return value range is between 0 and 8. 
+** The return value range is between 0 and 8.
 */
-uint8_t  CpMsgGetDlc(const CpCanMsg_ts * ptsCanMsgV);
+uint8_t  CpMsgGetDlc(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -181,7 +188,7 @@ uint8_t  CpMsgGetDlc(const CpCanMsg_ts * ptsCanMsgV);
 ** \deprecated It is advised to use CpMsgGetIdentifier() for new applications.
 **
 */
-uint32_t  CpMsgGetExtId(const CpCanMsg_ts * ptsCanMsgV);
+uint32_t  CpMsgGetExtId(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -195,7 +202,7 @@ uint32_t  CpMsgGetExtId(const CpCanMsg_ts * ptsCanMsgV);
 ** The frame format of the CAN message can be tested with the
 ** CpMsgIsExtended() function.
 */
-uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV);
+uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -204,7 +211,7 @@ uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV);
 ** \param   ptsCanMsgV  Pointer to a CpCanMsg_ts message
 ** \return  Standard Identifier value
 ** \see     CpMsgGetExtId()
-** 
+**
 ** This macro retrieves the value for the identifier of an
 ** standard frame (CAN 2.0A). The frame format of the CAN message
 ** can be tested with the CpMsgIsExtended() function.
@@ -212,7 +219,7 @@ uint32_t  CpMsgGetIdentifier(const CpCanMsg_ts * ptsCanMsgV);
 ** \deprecated It is advised to use CpMsgGetIdentifier() for new applications.
 **
 */
-uint16_t  CpMsgGetStdId(const CpCanMsg_ts * ptsCanMsgV);
+uint16_t  CpMsgGetStdId(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -224,7 +231,7 @@ uint16_t  CpMsgGetStdId(const CpCanMsg_ts * ptsCanMsgV);
 **
 ** This function returns the time-stamp value for a CAN frame.
 */
-/*@null@*/ CpTime_ts *  CpMsgGetTime(CpCanMsg_ts * ptsCanMsgV);
+/*@null@*/ CpTime_ts   *CpMsgGetTime(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -244,7 +251,7 @@ uint16_t  CpMsgGetStdId(const CpCanMsg_ts * ptsCanMsgV);
 ** The contents of the data field and all other optional fields
 ** (time-stamp, user, message marker) are not altered.
 */
-void      CpMsgInit(CpCanMsg_ts * ptsCanMsgV, uint8_t ubFormatV);
+void      CpMsgInit(CpCanMsg_ts *ptsCanMsgV, uint8_t ubFormatV);
 
 //------------------------------------------------------------------------------
 /*!
@@ -257,7 +264,7 @@ void      CpMsgInit(CpCanMsg_ts * ptsCanMsgV, uint8_t ubFormatV);
 ** frame and the bit-rate switch (BRS) bit is set, the value \c true
 ** is returned.
 */
-bool_t    CpMsgIsBitrateSwitch(const CpCanMsg_ts * ptsCanMsgV);
+bool_t    CpMsgIsBitrateSwitch(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -270,7 +277,7 @@ bool_t    CpMsgIsBitrateSwitch(const CpCanMsg_ts * ptsCanMsgV);
 ** (Standard Frame), the value \c false is returned. If the frame is
 ** CAN 2.0B (Extended Frame), the value \c true is returned.
 */
-bool_t   CpMsgIsExtended(const CpCanMsg_ts * ptsCanMsgV);
+bool_t   CpMsgIsExtended(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -282,7 +289,7 @@ bool_t   CpMsgIsExtended(const CpCanMsg_ts * ptsCanMsgV);
 ** This function checks the frame type. If the frame is a CAN FD frame
 ** CAN 2.0B (Extended Frame), the value \c true is returned.
 */
-bool_t   CpMsgIsFastData(const CpCanMsg_ts * ptsCanMsgV);
+bool_t   CpMsgIsFastData(const CpCanMsg_ts *ptsCanMsgV);
 
 //------------------------------------------------------------------------------
 /*!
@@ -293,7 +300,7 @@ bool_t   CpMsgIsFastData(const CpCanMsg_ts * ptsCanMsgV);
 ** This function checks if a data overrun has occurred for the message.
 */
 
-bool_t   CpMsgIsOverrun(const CpCanMsg_ts * ptsCanMsgV);
+bool_t   CpMsgIsOverrun(const CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -301,12 +308,12 @@ bool_t   CpMsgIsOverrun(const CpCanMsg_ts * ptsCanMsgV);
 ** \brief   Check for remote frame
 ** \param   ptsCanMsgV  Pointer to a CpCanMsg_ts message
 ** \return  0 for data frame, 1 for remote frame
-** 
+**
 ** This function checks if the Remote Transmission bit (RTR) is
 ** set. If the RTR bit is set, the function will return 1, otherwise
 ** 0.
 */
-bool_t   CpMsgIsRemote(const CpCanMsg_ts * ptsCanMsgV);
+bool_t   CpMsgIsRemote(const CpCanMsg_ts *ptsCanMsgV);
 
 //------------------------------------------------------------------------------
 /*!
@@ -318,7 +325,7 @@ bool_t   CpMsgIsRemote(const CpCanMsg_ts * ptsCanMsgV);
 ** frame the bit-rate switch (BRS) bit is set, otherwise the bit
 ** value in the message control field is not altered.
 */
-void     CpMsgSetBitrateSwitch(CpCanMsg_ts * ptsCanMsgV);
+void     CpMsgSetBitrateSwitch(CpCanMsg_ts *ptsCanMsgV);
 
 //------------------------------------------------------------------------------
 /*!
@@ -330,10 +337,10 @@ void     CpMsgSetBitrateSwitch(CpCanMsg_ts * ptsCanMsgV);
 ** This function sets the data in a CAN message. The parameter
 ** \c ubPosV must be within the range 0 .. 7 for Classical CAN frames. For
 ** ISO CAN FD frames the valid range is 0 .. 63. Please note that the
-** macro implementation does not check the value range of the parameter 
+** macro implementation does not check the value range of the parameter
 ** \c ubPosV.
 */
-void  CpMsgSetData(CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV);
+void  CpMsgSetData(CpCanMsg_ts *ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV);
 
 
 //------------------------------------------------------------------------------
@@ -347,7 +354,7 @@ void  CpMsgSetData(CpCanMsg_ts * ptsCanMsgV, uint8_t ubPosV, uint8_t ubValueV);
 ** Please note that the macro implementation does not check the value
 ** range of the parameter \c ubDlcV.
 */
-void  CpMsgSetDlc(CpCanMsg_ts * ptsCanMsgV, uint8_t ubDlcV);
+void  CpMsgSetDlc(CpCanMsg_ts *ptsCanMsgV, uint8_t ubDlcV);
 
 
 //------------------------------------------------------------------------------
@@ -364,7 +371,7 @@ void  CpMsgSetDlc(CpCanMsg_ts * ptsCanMsgV, uint8_t ubDlcV);
 **
 ** \deprecated It is advised to use CpMsgSetIdentifier() for new applications.
 */
-void  CpMsgSetExtId(CpCanMsg_ts * ptsCanMsgV, uint32_t ulExtIdV);
+void  CpMsgSetExtId(CpCanMsg_ts *ptsCanMsgV, uint32_t ulExtIdV);
 
 
 //------------------------------------------------------------------------------
@@ -382,7 +389,7 @@ void  CpMsgSetExtId(CpCanMsg_ts * ptsCanMsgV, uint32_t ulExtIdV);
 ** message uses extended frame format.
 **
 */
-void  CpMsgSetIdentifier(CpCanMsg_ts * ptsCanMsgV, uint32_t ulIdentifierV);
+void  CpMsgSetIdentifier(CpCanMsg_ts *ptsCanMsgV, uint32_t ulIdentifierV);
 
 
 //------------------------------------------------------------------------------
@@ -393,7 +400,7 @@ void  CpMsgSetIdentifier(CpCanMsg_ts * ptsCanMsgV, uint32_t ulIdentifierV);
 **
 ** This function sets the Overrun bit.
 */
-void  CpMsgSetOverrun(CpCanMsg_ts * ptsCanMsgV);
+void  CpMsgSetOverrun(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -404,7 +411,7 @@ void  CpMsgSetOverrun(CpCanMsg_ts * ptsCanMsgV);
 **
 ** This function sets the Remote Transmission bit (RTR).
 */
-void  CpMsgSetRemote(CpCanMsg_ts * ptsCanMsgV);
+void  CpMsgSetRemote(CpCanMsg_ts *ptsCanMsgV);
 
 
 //------------------------------------------------------------------------------
@@ -419,7 +426,7 @@ void  CpMsgSetRemote(CpCanMsg_ts * ptsCanMsgV);
 **
 ** \deprecated It is advised to use CpMsgSetIdentifier() for new applications.
 */
-void  CpMsgSetStdId(CpCanMsg_ts * ptsCanMsgV, uint16_t uwStdIdV);
+void  CpMsgSetStdId(CpCanMsg_ts *ptsCanMsgV, uint16_t uwStdIdV);
 
 
 //------------------------------------------------------------------------------
@@ -430,7 +437,7 @@ void  CpMsgSetStdId(CpCanMsg_ts * ptsCanMsgV, uint16_t uwStdIdV);
 **
 ** This function sets the time-stamp value for a CAN frame.
 */
-void  CpMsgSetTime(CpCanMsg_ts * ptsCanMsgV, const CpTime_ts * ptsTimeV);
+void  CpMsgSetTime(CpCanMsg_ts *ptsCanMsgV, const CpTime_ts *ptsTimeV);
 
 
 
@@ -459,7 +466,7 @@ void  CpMsgSetTime(CpCanMsg_ts * ptsCanMsgV, const CpTime_ts * ptsTimeV);
 
 
 #define  CpMsgGetData(MSG_PTR, POS)                               \
-            ((MSG_PTR)->aubData[POS])
+            ((MSG_PTR)->tuMsgData.aubByte[POS])
 
 #define  CpMsgGetDlc(MSG_PTR)                                     \
             ((MSG_PTR)->ubMsgDLC)
@@ -505,7 +512,7 @@ void  CpMsgSetTime(CpCanMsg_ts * ptsCanMsgV, const CpTime_ts * ptsTimeV);
          } while(0)
 
 #define  CpMsgSetData(MSG_PTR, POS, VAL)                          \
-            ( (MSG_PTR)->aubData[POS] = (VAL) )
+            ( (MSG_PTR)->tuMsgData.aubByte[POS] = (VAL) )
 
 #define  CpMsgSetDlc(MSG_PTR, DLC)                                \
          do {                                                     \

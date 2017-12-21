@@ -2,7 +2,7 @@
 // File:          qcan_network.cpp                                            //
 // Description:   QCAN classes - CAN network                                  //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -253,7 +260,7 @@ bool QCanNetwork::addInterface(QCanInterface * pclCanIfV)
       {
          if (pclCanIfV->setBitrate(slNomBitRateP, slDatBitRateP) == QCanInterface::eERROR_NONE)
          {
-            if (pclCanIfV->setMode(eCAN_MODE_START) == QCanInterface::eERROR_NONE)
+            if (pclCanIfV->setMode(eCAN_MODE_OPERATION) == QCanInterface::eERROR_NONE)
             {
                pclInterfaceP = pclCanIfV;
                btResultT = true;
@@ -524,14 +531,10 @@ bool  QCanNetwork::handleApiFrame(int32_t & slSockSrcR,
             break;
 
          case QCanFrameApi::eAPI_FUNC_BITRATE:
-            qDebug() << "Got bitrate setting" << clApiFrameT.bitrateNominal();
-            this->setBitrate( clApiFrameT.bitrateNominal(), 
-                              clApiFrameT.bitrateData());
-            if(!pclInterfaceP.isNull())
-            {
-               //pclInterfaceP->setBitrate( clApiFrameT.bitrate(),
-               //                           clApiFrameT.brsClock());
-            }
+
+            this->setBitrate( clApiFrameT.nominalBitrate(),
+                              clApiFrameT.dataBitrate());
+     
             btResultT = true;
             break;
 
@@ -539,13 +542,6 @@ bool  QCanNetwork::handleApiFrame(int32_t & slSockSrcR,
 
             break;
 
-         case QCanFrameApi::eAPI_FUNC_DRIVER_INIT:
-
-            break;
-
-         case QCanFrameApi::eAPI_FUNC_DRIVER_RELEASE:
-
-            break;
 
 
          default:
@@ -790,8 +786,18 @@ void QCanNetwork::onSocketConnect(void)
             SLOT(onSocketDisconnect())   );
    
    //----------------------------------------------------------------
-   // 
-   clFrameApiT.setName(clNetNameP);
+   // Send information to client:
+   // - interface name
+   // - actual bit-rate
+   //
+   if (!pclInterfaceP.isNull())
+   {
+      clFrameApiT.setName(pclInterfaceP->name());
+   }
+   else
+   {
+      clFrameApiT.setName("Virtual CAN");
+   }
    pclSocketT->write(clFrameApiT.toByteArray());
    clFrameApiT.setBitrate(slNomBitRateP, slDatBitRateP);
    pclSocketT->write(clFrameApiT.toByteArray());
@@ -868,7 +874,7 @@ void QCanNetwork::onTimerEvent(void)
    if(pclInterfaceP.isNull() == false)
    {
       slSockIdxT = QCAN_SOCKET_CAN_IF;
-      while(pclInterfaceP->read(clSockDataT) != QCanInterface::eERROR_FIFO_RCV_EMPTY)
+      while(pclInterfaceP->read(clSockDataT) == QCanInterface::eERROR_NONE)
       {
          switch(frameType(clSockDataT))
          {
@@ -958,7 +964,9 @@ void QCanNetwork::onTimerEvent(void)
                break;         
                
             default:
-               
+               addLogMessage(CAN_Channel_e (id()), "Wrong message type",
+                             eLOG_LEVEL_DEBUG);
+
                break;
          }
       }
@@ -1099,9 +1107,9 @@ void QCanNetwork::setBitrate(int32_t slNomBitRateV, int32_t slDatBitRateV)
       //
       if(!pclInterfaceP.isNull())
       {
-         pclInterfaceP->setMode(eCAN_MODE_STOP);
+         pclInterfaceP->setMode(eCAN_MODE_INIT);
          pclInterfaceP->setBitrate(slNomBitRateP, slDatBitRateP);
-         pclInterfaceP->setMode(eCAN_MODE_START);
+         pclInterfaceP->setMode(eCAN_MODE_OPERATION);
       }
 
       //--------------------------------------------------------
@@ -1110,14 +1118,14 @@ void QCanNetwork::setBitrate(int32_t slNomBitRateV, int32_t slDatBitRateV)
       if (btFastDataEnabledP)
       {
          addLogMessage(CAN_Channel_e (id()),
-                       "Set bit-rate " + nominalBitrateString(),
+                       "Set nominal bit-rate " + nominalBitrateString() +
+                       " and data bit-rate " + dataBitrateString(),
                        eLOG_LEVEL_NOTICE);
       }
       else
       {
          addLogMessage(CAN_Channel_e (id()),
-                       "Set nominal bit-rate " + nominalBitrateString() +
-                       " and data bit-rate " + dataBitrateString(),
+                       "Set bit-rate " + nominalBitrateString(),
                        eLOG_LEVEL_NOTICE);
       }
    }
@@ -1152,6 +1160,18 @@ void QCanNetwork::setErrorFramesEnabled(bool btEnableV)
    {
       btErrorFramesEnabledP = false;
    }
+
+   if (btErrorFramesEnabledP)
+   {
+      addLogMessage(CAN_Channel_e (id()), "CAN error frame support enabled",
+                    eLOG_LEVEL_NOTICE);
+   }
+   else
+   {
+      addLogMessage(CAN_Channel_e (id()), "CAN error frame support disabled",
+                    eLOG_LEVEL_NOTICE);
+   }
+
 }
 
 
@@ -1168,6 +1188,17 @@ void QCanNetwork::setFastDataEnabled(bool btEnableV)
    else
    {
       btFastDataEnabledP = false;
+   }
+
+   if (btFastDataEnabledP)
+   {
+      addLogMessage(CAN_Channel_e (id()), "CAN FD support enabled",
+                    eLOG_LEVEL_NOTICE);
+   }
+   else
+   {
+      addLogMessage(CAN_Channel_e (id()), "CAN FD support disabled",
+                    eLOG_LEVEL_NOTICE);
    }
 }
 

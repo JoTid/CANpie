@@ -1,8 +1,8 @@
 //============================================================================//
-// File:          cp_fifo.h                                                   //
+// File:          cp_fifo.c                                                   //
 // Description:   CANpie FIFO functions                                       //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -47,7 +54,7 @@
 // CpFifoDataInPtr()                                                          //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline CpCanMsg_ts * CpFifoDataInPtr(CpFifo_ts * ptsFifoV)
+CPP_INLINE CpCanMsg_ts *CpFifoDataInPtr(CpFifo_ts *ptsFifoV)
 {
    //----------------------------------------------------------------
    // allow pointer arithmetic here, because index is limited
@@ -64,7 +71,7 @@ inline CpCanMsg_ts * CpFifoDataInPtr(CpFifo_ts * ptsFifoV)
 // CpFifoDataOutPtr()                                                         //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline CpCanMsg_ts * CpFifoDataOutPtr(CpFifo_ts * ptsFifoV)
+CPP_INLINE CpCanMsg_ts *CpFifoDataOutPtr(CpFifo_ts *ptsFifoV)
 {
    //----------------------------------------------------------------
    // allow pointer arithmetic here, because index is limited
@@ -81,10 +88,10 @@ inline CpCanMsg_ts * CpFifoDataOutPtr(CpFifo_ts * ptsFifoV)
 // CpFifoIncIn()                                                              //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline void CpFifoIncIn(CpFifo_ts * ptsFifoV)
+CPP_INLINE void CpFifoIncIn(CpFifo_ts *ptsFifoV)
 {
    ptsFifoV->ulIndexIn++;
-   if ( (ptsFifoV->ulIndexIn) >= (ptsFifoV->ulIndexMax) )
+   if ((ptsFifoV->ulIndexIn) >= (ptsFifoV->ulIndexMax))
    {
       ptsFifoV->ulIndexIn = 0;
    }
@@ -95,10 +102,10 @@ inline void CpFifoIncIn(CpFifo_ts * ptsFifoV)
 // CpFifoIncOut()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline void CpFifoIncOut(CpFifo_ts * ptsFifoV)
+CPP_INLINE void CpFifoIncOut(CpFifo_ts *ptsFifoV)
 {
    ptsFifoV->ulIndexOut++;
-   if ( (ptsFifoV->ulIndexOut) >= (ptsFifoV->ulIndexMax) )
+   if ((ptsFifoV->ulIndexOut) >= (ptsFifoV->ulIndexMax))
    {
       ptsFifoV->ulIndexOut = 0;
    }
@@ -109,8 +116,8 @@ inline void CpFifoIncOut(CpFifo_ts * ptsFifoV)
 // CpFifoInit()                                                               //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline void CpFifoInit( CpFifo_ts * ptsFifoV, CpCanMsg_ts * ptsCanMsgV, 
-                        uint32_t ulSizeV)
+CPP_INLINE void CpFifoInit(CpFifo_ts *ptsFifoV, CpCanMsg_ts *ptsCanMsgV,
+                       uint32_t ulSizeV)
 {
    ptsFifoV->ulIndexIn  = 0;
    ptsFifoV->ulIndexOut = 0;
@@ -125,15 +132,15 @@ inline void CpFifoInit( CpFifo_ts * ptsFifoV, CpCanMsg_ts * ptsCanMsgV,
 // CpFifoIsEmpty()                                                            //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline bool_t CpFifoIsEmpty(CpFifo_ts * ptsFifoV)
+CPP_INLINE bool_t CpFifoIsEmpty(CpFifo_ts *ptsFifoV)
 {
    bool_t btResultT = false;
-   
+
    if ((ptsFifoV->ulIndexIn) == (ptsFifoV->ulIndexOut))
    {
       btResultT = true;
    }
-   
+
    return (btResultT);
 }
 
@@ -142,17 +149,17 @@ inline bool_t CpFifoIsEmpty(CpFifo_ts * ptsFifoV)
 // CpFifoIsFull()                                                             //
 //                                                                            //
 //----------------------------------------------------------------------------//
-inline bool_t CpFifoIsFull(CpFifo_ts * ptsFifoV)
+CPP_INLINE bool_t CpFifoIsFull(CpFifo_ts *ptsFifoV)
 {
    bool_t btResultT = false;
 
-   if (   ((ptsFifoV->ulIndexIn + 1) == (ptsFifoV->ulIndexOut)) ||
-        ( ((ptsFifoV->ulIndexOut) == 0) && 
-          ((ptsFifoV->ulIndexIn + 1) == ptsFifoV->ulIndexMax) ) )
+   if (((ptsFifoV->ulIndexIn + 1) == (ptsFifoV->ulIndexOut)) ||
+         (((ptsFifoV->ulIndexOut) == 0) &&
+          ((ptsFifoV->ulIndexIn + 1) == ptsFifoV->ulIndexMax)))
    {
       btResultT = true;
    }
-   
+
    return (btResultT);
-   
+
 }

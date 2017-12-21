@@ -2,7 +2,7 @@
 // File:          qcan_frame_error.cpp                                        //
 // Description:   QCan classes - CAN error frame                              //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -54,7 +61,10 @@
 //----------------------------------------------------------------------------//
 QCanFrameError::QCanFrameError() : QCanData(eTYPE_ERROR)
 {
-
+   setErrorState(eCAN_STATE_BUS_ACTIVE);
+   setErrorCounterReceive(0);
+   setErrorCounterTransmit(0);
+   setErrorType(eERROR_TYPE_NONE);
 }
 
 
@@ -192,16 +202,23 @@ QString QCanFrameError::toString(const bool & btShowTimeR)
    //
    QString clStringT;
    
+   uint32_t ulSecondsT = 0;
+   uint32_t ulNanoSecT = 0;
+
+
    if(btShowTimeR == true)
    {
-      
+      ulSecondsT = this->timeStamp().seconds();
+      ulNanoSecT = this->timeStamp().nanoSeconds();
+      ulNanoSecT = ulNanoSecT / 10000;
+      clStringT = QString("%1.%2 ").arg(ulSecondsT, 5, 10).arg(ulNanoSecT, 5, 10, QChar('0'));
    }
    
 
    //----------------------------------------------------------------
    // print frame format
    //
-   clStringT += "CAN error frame   ";
+   clStringT += "   Error frame  :  ";
 
    switch(this->errorState())
    {
@@ -226,6 +243,36 @@ QString QCanFrameError::toString(const bool & btShowTimeR)
          break;
    }
    
+   clStringT += QString(" (Rx=%1, Tx=%2) ").arg(errorCounterReceive()).arg(errorCounterTransmit());
+
+   switch(this->errorType())
+   {
+      case eERROR_TYPE_NONE:
+
+         break;
+
+      case eERROR_TYPE_BIT0:
+      case eERROR_TYPE_BIT1:
+         clStringT += ", bit error";
+         break;
+
+      case eERROR_TYPE_STUFF:
+         clStringT += ", stuff error";
+         break;
+
+      case eERROR_TYPE_FORM:
+         clStringT += ", form error";
+         break;
+
+      case eERROR_TYPE_CRC:
+         clStringT += ", CRC error";
+         break;
+
+      case eERROR_TYPE_ACK:
+         clStringT += ", acknowledgement error";
+         break;
+
+   }
    return(clStringT);
 }
       

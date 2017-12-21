@@ -2,7 +2,7 @@
 // File:          qcan_namespace.hpp                                          //
 // Description:   QCan namespace                                              //
 //                                                                            //
-// Copyright (C) MicroControl GmbH & Co. KG                                   //
+// Copyright 2017 MicroControl GmbH & Co. KG                                  //
 // 53844 Troisdorf - Germany                                                  //
 // www.microcontrol.net                                                       //
 //                                                                            //
@@ -20,10 +20,17 @@
 //    may be used to endorse or promote products derived from this software   //
 //    without specific prior written permission.                              //
 //                                                                            //
-// Provided that this notice is retained in full, this software may be        //
-// distributed under the terms of the GNU Lesser General Public License       //
-// ("LGPL") version 3 as distributed in the 'LICENSE' file.                   //
+// Licensed under the Apache License, Version 2.0 (the "License");            //
+// you may not use this file except in compliance with the License.           //
+// You may obtain a copy of the License at                                    //
 //                                                                            //
+//    http://www.apache.org/licenses/LICENSE-2.0                              //
+//                                                                            //
+// Unless required by applicable law or agreed to in writing, software        //
+// distributed under the License is distributed on an "AS IS" BASIS,          //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.   //
+// See the License for the specific language governing permissions and        //
+// limitations under the License.                                             //
 //============================================================================//
 
 
@@ -130,9 +137,15 @@ namespace QCan {
       eCAN_BITRATE_MAX = 9999 //!< eCAN_BITRATE_MAX
    };
 
+   
+   /*!
+   ** \enum CAN_Channel_e
+   ** 
+   ** The enumeration CAN_Channel_e defines up to 8 CAN channels.
+   */
    enum CAN_Channel_e {
 
-      /* CAN interface invalid         */
+      /*! CAN interface invalid        */
       eCAN_CHANNEL_NONE = 0,
 
       /*! CAN interface 1              */
@@ -160,6 +173,12 @@ namespace QCan {
       eCAN_CHANNEL_8
    };
 
+   /*!
+   ** \enum CAN_State_e
+   ** 
+   ** The enumeration CAN_State_e defines possible states of the CAN
+   ** protocol engine.
+   */
    enum CAN_State_e {
       /*!
       ** CAN controller is in stopped mode
@@ -195,22 +214,38 @@ namespace QCan {
       eCAN_STATE_BUS_OFF
    };
 
+   /*!
+   ** \enum CAN_Mode_e
+   ** 
+   ** The enumeration CAN_Mode_e defines possible modes of the CAN
+   ** protocol engine.
+   */
    enum CAN_Mode_e {
-      /*!   Set controller in Stop mode (no reception / transmission possible)
-      */
-      eCAN_MODE_STOP = 0,
 
-      /*!   Set controller into normal operation
+      /*!   Set controller into 'Initialization' mode
       */
-      eCAN_MODE_START,
+      eCAN_MODE_INIT = 0,
 
-      /*!   Set controller into listen-only mode
-      */
-      eCAN_MODE_LISTEN_ONLY,
+      eCAN_MODE_STOP = 0,     // deprecated definition
 
-      /*!   Set controller into Sleep mode
+
+      /*!   Set controller into Operation' mode
       */
-      eCAN_MODE_SLEEP
+      eCAN_MODE_OPERATION = 1,
+
+      eCAN_MODE_START = 1,    // deprecated definition
+
+      /*!   Set controller into 'Listen-only' mode
+      */
+      eCAN_MODE_LISTEN_ONLY = 2,
+
+      /*!   Set controller into 'Sleep' (power-down) mode
+      */
+      eCAN_MODE_SLEEP = 3,
+
+      /*!   Set controller into 'Self-test' mode
+      */
+      eCAN_MODE_SELF_TEST = 4
    };
 
    enum LogLevel_e {
